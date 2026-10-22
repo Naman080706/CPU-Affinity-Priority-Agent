@@ -1,0 +1,36 @@
+[Unit]
+Description=CPU Affinity & Priority Agent (headless)
+Documentation=file:/opt/cpu-affinity-agent/README.md
+After=multi-user.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart=/usr/bin/python3 -m cpu_affinity_agent.agent --config /etc/cpu-affinity-agent/config.json
+# Reload config on `systemctl reload cpu-affinity-agent`
+ExecReload=/bin/kill -HUP $MAINPID
+WorkingDirectory=/opt/cpu-affinity-agent
+Restart=on-failure
+RestartSec=3
+
+# --- Privileges ---------------------------------------------------------
+# Lowering a nice value (raising priority) and pinning other users' processes
+# requires CAP_SYS_NICE. Run as root OR grant just that capability:
+#   User=caa-agent
+#   AmbientCapabilities=CAP_SYS_NICE
+#   CapabilityBoundingSet=CAP_SYS_NICE
+User=root
+
+# --- Hardening (sandboxing) --------------------------------------------
+NoNewPrivileges=false
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadOnlyPaths=/etc/cpu-affinity-agent
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX
+MemoryDenyWriteExecute=true
+
+[Install]
+WantedBy=multi-user.target
