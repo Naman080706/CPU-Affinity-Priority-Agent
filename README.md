@@ -187,29 +187,5 @@ taskset -cp <pid>          # shows current affinity mask
 cat /proc/<pid>/stat | awk '{print "nice:", $19}'
 ```
 
----
-
-## 7. Files
-
-The project is split into two parts with no shared files, so the two authors
-can work and commit independently (see [CONTRIBUTORS.md](CONTRIBUTORS.md)).
-
-```
-Part A - Policy engine & configuration   (Ankit Ray, 24BCE0497)
-  cpu_affinity_agent/config.py         # Rule, Config: load + validate JSON
-  cpu_affinity_agent/matching.py       # process_matches: the matching engine
-  cpu_affinity_agent/enforcement.py    # set_affinity / set_nice (os.sched_*)
-  config/agent.json                    # sample rules
-  tests/test_engine.py                 # engine unit + affinity integration tests
-
-Part B - Daemon, service & packaging    (Naman Jain, 24BKT0140)
-  cpu_affinity_agent/__init__.py       # package, lazy re-exports
-  cpu_affinity_agent/agent.py          # Agent daemon: poll loop, signals, CLI
-  systemd/cpu-affinity-agent.service   # systemd unit (Type=notify, hardened)
-  install.sh                           # Ubuntu installer
-  requirements.txt                     # psutil
-  tests/test_agent.py                  # daemon / dry-run / end-to-end tests
-  README.md                            # this file
-```
 
 Part B imports Part A; neither part edits the other's files.
