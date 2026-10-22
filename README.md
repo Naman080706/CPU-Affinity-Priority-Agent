@@ -187,5 +187,3 @@ taskset -cp <pid>          # shows current affinity mask
 cat /proc/<pid>/stat | awk '{print "nice:", $19}'
 ```
 
-
-Part B imports Part A; neither part edits the other's files.
