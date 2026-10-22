@@ -1,0 +1,23 @@
+{
+  "poll_interval_seconds": 5,
+  "dry_run": false,
+  "rules": [
+    {
+      "name": "pin-nginx-to-first-cores",
+      "match": { "name": "nginx" },
+      "cpu_affinity": [0, 1],
+      "nice": -5
+    },
+    {
+      "name": "throttle-backup-jobs",
+      "match": { "cmdline_contains": "rsync" },
+      "cpu_affinity": [2, 3],
+      "nice": 15
+    },
+    {
+      "name": "deprioritize-compilers",
+      "match": { "name_regex": "^(gcc|cc1|cc1plus|ld)$" },
+      "nice": 10
+    }
+  ]
+}
