@@ -10,6 +10,28 @@ It is one of three agents in the project; this is **Agent #3: CPU Affinity & Pri
 
 ---
 
+## Architecture
+
+**Figure 1 — Deployment architecture.** `systemd` supervises the agent, the
+config file feeds it rules, `journald` collects its logs, and the kernel does
+the actual scheduling work. Everything above the dividing line is user space.
+
+![Deployment architecture](docs/architecture.png)
+
+**Figure 2 — Enforcement data flow (one poll cycle).** Each cycle scans every
+process, tests it against the rules, and applies CPU affinity and nice to the
+first rule that matches, skipping anything already in the desired state.
+
+![Enforcement data flow](docs/dataflow.png)
+
+**Figure 3 — Service lifecycle and poll loop.** Readiness notification to
+systemd, the scan-and-sleep loop, `SIGHUP` config reload, and a clean
+`SIGTERM`/`SIGINT` shutdown.
+
+![Service lifecycle and poll loop](docs/lifecycle.png)
+
+---
+
 ## 1. Approach — "agent as a service, no UI"
 
 The agent is a long-running **daemon**. It has no GUI/CLI interaction during
@@ -151,7 +173,7 @@ python3 -m cpu_affinity_agent.agent --config config/agent.json --check
 # single enforcement cycle then exit (great with dry_run)
 python3 -m cpu_affinity_agent.agent --config config/agent.json --once
 
-# full test suite (14 tests: config, matching engine, dry-run, real affinity)
+# full test suite (15 tests: config, matching engine, dry-run, real affinity, end-to-end)
 python3 -m pytest tests/ -v          # runs test_engine.py + test_agent.py
 ```
 
